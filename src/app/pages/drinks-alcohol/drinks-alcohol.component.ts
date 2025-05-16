@@ -1,10 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import {ExcelService, MenuItem} from "../../services/excel.service";
 
 @Component({
   selector: 'app-drinks-alcohol',
   templateUrl: './drinks-alcohol.component.html',
-  styleUrl: './drinks-alcohol.component.css'
+  styleUrls: ['./drinks-alcohol.component.css']
 })
-export class DrinksAlcoholComponent {
+export class DrinksAlcoholComponent implements OnInit {
+  allItems: MenuItem[] = [];
+  filteredItems: MenuItem[] = [];
+  podkategorije: string[] = [];
+  selektovanaKategorija: string | null = null;
 
+  constructor(private excelService: ExcelService) {}
+
+  ngOnInit(): void {
+    this.excelService.readExcelFile('assets/rash_meni_final_bez_ostalo.xlsx')
+      .subscribe((items: MenuItem[]) => {
+        this.allItems = items.filter(item => item.glavnakategorija === 'Alkoholna pića');
+        this.filteredItems = [...this.allItems];
+        this.podkategorije = [...new Set(this.allItems.map(i => i.kategorija))];
+      });
+  }
+
+  filtrirajPoKategoriji(kategorija: string): void {
+    if (this.selektovanaKategorija === kategorija) {
+      this.selektovanaKategorija = null;
+      this.filteredItems = [...this.allItems];
+    } else {
+      this.selektovanaKategorija = kategorija;
+      this.filteredItems = this.allItems.filter(item => item.kategorija === kategorija);
+    }
+  }
 }

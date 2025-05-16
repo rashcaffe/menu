@@ -6,17 +6,12 @@ import {DrinksNonAlcoholComponent} from "./pages/drinks-non-alcohol/drinks-non-a
 import {DrinksAlcoholComponent} from "./pages/drinks-alcohol/drinks-alcohol.component";
 
 const routes: Routes = [
-  {
-    path: 'meni',
-    component: MenuComponent,
-    children: [
-      { path: 'hrana', component: FoodCategoryComponent },
-      { path: 'bezalkoholna-pica', component: DrinksNonAlcoholComponent },
-      { path: 'alkoholna-pica', component: DrinksAlcoholComponent }
-    ]
-  }
-
+  { path: '', component: MenuComponent },
+  { path: 'pages/drinks-alcohol', component: DrinksAlcoholComponent },
+  { path: 'pages/drinks-non-alcohol', component: DrinksNonAlcoholComponent },
+  { path: 'pages/food-category', component: FoodCategoryComponent },
 ];
+
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

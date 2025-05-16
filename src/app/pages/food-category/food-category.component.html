@@ -1,1 +1,28 @@
-<p>food-category works!</p>
+<div class="back-button" routerLink="/">← Početak</div>
+
+<div class="food-nav">
+  <a
+    *ngFor="let kat of podkategorije"
+    (click)="filtrirajPoKategoriji(kat)"
+    [class.active]="kat === selektovanaKategorija"
+  >
+    {{ kat }}
+  </a>
+</div>
+
+<div class="food-list">
+  <div class="menu-box" *ngFor="let item of filteredItems">
+    <div class="menu-box-content">
+      <h3>{{ item.naziv }}</h3>
+      <p *ngIf="item.opis">{{ item.opis }}</p>
+      <ul *ngIf="item.dodaci && item.dodaci.length > 0">
+        <li *ngFor="let dodatak of item.dodaci">
+          + {{ dodatak.naziv }} ({{ dodatak.cena }} RSD)
+        </li>
+      </ul>
+    </div>
+    <div class="menu-price-badge">
+      {{ item.cena }} RSD
+    </div>
+  </div>
+</div>

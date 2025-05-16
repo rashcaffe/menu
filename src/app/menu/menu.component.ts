@@ -12,7 +12,7 @@ export class MenuComponent implements OnInit {
   constructor(private excelService: ExcelService) {}
 
   ngOnInit(): void {
-    this.excelService.readExcelFile('assets/rash_meni_final.xlsx').subscribe((items: MenuItem[]) => {
+    this.excelService.readExcelFile('assets/rash_meni_final_bez_ostalo.xlsx').subscribe((items: MenuItem[]) => {
       this.groupedMenu = this.groupByCategory(items);
     });
   }

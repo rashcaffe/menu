@@ -17,18 +17,26 @@ export class ExcelService {
         const worksheet = workbook.Sheets[sheetName];
         const json: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-        return json
-          .filter(row => row["Naziv"] && row["Cena"] !== undefined)
-          .map((row): MenuItem => ({
-            kategorija: row["Kategorija"],
-            naziv: row["Naziv"],
-            cena: Number(row["Cena"]),
-            opis: row["Opis"],
-            dodaci: this.parseDodaci(row["Dodaci"]),
-          }));
+        return json.map((row): MenuItem => ({
+          kategorija: row["Kategorija"],
+          naziv: row["Naziv"],
+          cena: Number(row["Cena"]),
+          opis: row["Opis"],
+          glavnakategorija: row ["GlavnaKategorija"],
+          dodaci: this.parseDodaci(row["Dodaci"]),
+        }));
       })
     );
   }
+
+  getFoodItems(filePath: string): Observable<MenuItem[]> {
+    return this.readExcelFile(filePath).pipe(
+      map(items =>
+        items.filter(item => item['glavnakategorija'] === 'Hrana')
+      )
+    );
+  }
+
 
   private parseDodaci(dodaciRaw: string): DodaciItem[] {
     if (!dodaciRaw) return [];
@@ -47,6 +55,7 @@ export interface MenuItem {
   naziv: string;
   cena: number;
   opis: string;
+  glavnakategorija: string;
   dodaci?: DodaciItem[];
 }
 
