@@ -1,0 +1,143 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.menu-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('/assets/pozadina.png');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Segoe UI', sans-serif;
+  overflow: hidden;
+}
+
+.logo {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  z-index: 10;
+}
+
+.circle {
+  position: fixed;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 4px solid #5c3b1e;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease-in-out;
+}
+
+.circle:hover {
+  transform: scale(1.08);
+  cursor: pointer;
+}
+
+.circle-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('/assets/pozadinapozadine.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+.circle-image {
+  position: absolute;
+  width: 80%;
+  height: auto;
+  object-fit: contain;
+  z-index: 2;
+  margin-bottom: 0.5rem;
+}
+.alkoholno .circle-image {
+  top: -25px;
+}
+
+.circle-label {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff8e7;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.4rem 1.2rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 1px 1px 3px #000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.circle-label {
+  font-size: 0.95rem;
+  max-width: 90%;
+  white-space: normal;
+  text-align: center;
+  word-wrap: break-word;
+  line-height: 1.2;
+}
+.circle-label {
+  padding: 0.3rem 0.8rem;
+  max-width: 80%;
+  z-index: 1000;
+}
+
+
+/* === Mobilne pozicije === */
+.alkoholno {
+  top: 28%;
+  left: -60px;
+}
+
+.nealkoholno {
+  top: 18%;
+  right: -50px;
+}
+
+.hrana {
+  bottom: 25px;
+  left: 20px;
+}
+
+/* === Desktop pozicije === */
+@media screen and (min-width: 769px) {
+  .circle {
+    width: 280px;
+    height: 280px;
+  }
+
+  .alkoholno {
+    top: 25%;
+    left: 15%;
+  }
+
+  .nealkoholno {
+    top: 15%;
+    right: 15%;
+  }
+
+  .hrana {
+    bottom: 10%;
+    left: 35%;
+  }
+
+  .circle-label {
+    font-size: 1.3rem;
+  }
+}
