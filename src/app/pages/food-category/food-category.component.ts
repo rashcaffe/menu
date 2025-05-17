@@ -15,14 +15,14 @@ export class FoodCategoryComponent implements OnInit {
   constructor(private excelService: ExcelService) {}
 
   ngOnInit(): void {
-    this.excelService.readExcelFile('assets/rash_meni_final_bez_ostalo.xlsx').subscribe((items) => {
-      this.allItems = items.filter(item => item.glavnakategorija === 'Hrana');
-      this.filteredItems = [...this.allItems];
-
-      // Izdvajanje unikatnih podkategorija
-      this.podkategorije = [...new Set(this.allItems.map(item => item.kategorija))];
-    });
+    this.excelService.getMenuItems()
+      .subscribe((items: MenuItem[]) => {
+        this.allItems = items.filter(item => item.glavnakategorija === 'Hrana');
+        this.filteredItems = [...this.allItems];
+        this.podkategorije = [...new Set(this.allItems.map(i => i.kategorija))];
+      });
   }
+
 
   filtrirajPoKategoriji(kategorija: string): void {
     if (this.selektovanaKategorija === kategorija) {
