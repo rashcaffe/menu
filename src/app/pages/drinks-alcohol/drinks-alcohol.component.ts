@@ -12,16 +12,17 @@ export class DrinksAlcoholComponent implements OnInit {
   podkategorije: string[] = [];
   selektovanaKategorija: string | null = null;
 
-  constructor(private excelService: ExcelService) {}
-
-  ngOnInit(): void {
-    this.excelService.getMenuItems()
-      .subscribe((items: MenuItem[]) => {
-        this.allItems = items.filter(item => item.glavnakategorija === 'Alkoholna pića');
-        this.filteredItems = [...this.allItems];
-        this.podkategorije = [...new Set(this.allItems.map(i => i.kategorija))];
-      });
+  constructor(private excelService: ExcelService) {
+    this.excelService.loadData();
   }
+  ngOnInit(): void {
+    this.excelService.getMenuItems().subscribe((items: MenuItem[]) => {
+      this.allItems = items.filter(item => item.glavnakategorija === 'Alkoholna pića');
+      this.filteredItems = [...this.allItems];
+      this.podkategorije = [...new Set(this.allItems.map(i => i.kategorija))];
+    });
+  }
+
 
 
   filtrirajPoKategoriji(kategorija: string): void {
