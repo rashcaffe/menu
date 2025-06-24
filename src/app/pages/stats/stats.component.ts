@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { ExcelService } from '../../services/excel.service';
+import { PosetaService } from '../../services/poseta.service';
 
 @Component({
   selector: 'app-stats',
@@ -9,16 +8,7 @@ import { ExcelService } from '../../services/excel.service';
   styleUrls: ['./stats.component.css']
 })
 export class StatsComponent implements OnInit {
-  public statistika: StatistikaPoseta | null = null;
-
-  public posete: {
-    danas: number;
-    juce: number;
-    prekjuce: number;
-    nedelja: number;
-    mesec: number;
-    ukupno: number;
-  } = {
+  public posete = {
     danas: 0,
     juce: 0,
     prekjuce: 0,
@@ -28,108 +18,59 @@ export class StatsComponent implements OnInit {
   };
 
   private validKey = '1982fsd93f92jsdf';
-  private baseKey = 'rashcaffe.github.io/menu';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient,
-    private excelService: ExcelService
+    private posetaService: PosetaService
   ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     const key = this.route.snapshot.paramMap.get('key');
     if (key !== this.validKey) {
       this.router.navigate(['/']);
       return;
     }
 
-    this.ucitajStatistikuIzSheeta();
-    this.ucitajCountApiPosete();
+    setTimeout(() => {
+      this.ucitajStatistiku();
+    }, 1000);
   }
 
-  private ucitajStatistikuIzSheeta(): void {
-    this.excelService.getStatistika().subscribe((res) => {
-      this.statistika = res;
-    });
-  }
-
-  private ucitajCountApiPosete(): void {
+  private async ucitajStatistiku(): Promise<void> {
     const danas = this.formatDateOffset(0);
     const juce = this.formatDateOffset(-1);
     const prekjuce = this.formatDateOffset(-2);
+    const nedeljaDatumi = this.getDatumiUnazad(7);
+    const mesecDatumi = this.getDatumiTekucegMeseca();
 
-    this.ucitajJedanDatum(danas, 'danas');
-    this.ucitajJedanDatum(juce, 'juce');
-    this.ucitajJedanDatum(prekjuce, 'prekjuce');
-
-    const poslednjih7 = this.getDatumiUnazad(7);
-    this.ucitajViseDana(poslednjih7, 'nedelja');
-
-    const datumiMeseca = this.getDatumiTekucegMeseca();
-    this.ucitajViseDana(datumiMeseca, 'mesec');
+    this.posete.danas = await this.posetaService.getPosetaZaDatum(danas);
+    this.posete.juce = await this.posetaService.getPosetaZaDatum(juce);
+    this.posete.prekjuce = await this.posetaService.getPosetaZaDatum(prekjuce);
+    this.posete.nedelja = await this.sumirajPosete(nedeljaDatumi);
+    this.posete.mesec = await this.sumirajPosete(mesecDatumi);
+    this.posete.ukupno = this.posete.mesec;
   }
 
-  private ucitajJedanDatum(datum: string, polje: keyof typeof this.posete): void {
-    const url = `https://api.countapi.xyz/get/${this.baseKey}/${datum}`;
-    this.http.get(url).subscribe({
-      next: (res: any) => {
-        this.posete[polje] = res.value;
-        this.azurirajUkupno();
-      },
-      error: () => {
-        this.posete[polje] = 0;
-        this.azurirajUkupno();
-      }
-    });
-  }
-
-  private ucitajViseDana(datumi: string[], polje: keyof typeof this.posete): void {
-    let zbir = 0;
-    let brojac = 0;
-
-    datumi.forEach(datum => {
-      const url = `https://api.countapi.xyz/get/${this.baseKey}/${datum}`;
-      this.http.get(url).subscribe({
-        next: (res: any) => {
-          zbir += res.value;
-          brojac++;
-          if (brojac === datumi.length) {
-            this.posete[polje] = zbir;
-            this.azurirajUkupno();
-          }
-        },
-        error: () => {
-          brojac++;
-          if (brojac === datumi.length) {
-            this.posete[polje] = zbir;
-            this.azurirajUkupno();
-          }
-        }
-      });
-    });
-  }
-
-  private azurirajUkupno(): void {
-    this.posete.ukupno = this.posete.mesec; // za sada ukupno = mesec
+  private async sumirajPosete(datumi: string[]): Promise<number> {
+    const posete = await Promise.all(datumi.map(d => this.posetaService.getPosetaZaDatum(d)));
+    return posete.reduce((sum, val) => sum + val, 0);
   }
 
   private formatDateOffset(offset: number): string {
     const d = new Date();
     d.setDate(d.getDate() + offset);
-    return d.toISOString().substring(0, 10);
+    return this.formatDateLocal(d);
   }
 
   private getDatumiUnazad(dana: number): string[] {
     const danas = new Date();
     const datumi: string[] = [];
-
     for (let i = 0; i < dana; i++) {
       const d = new Date(danas);
       d.setDate(d.getDate() - i);
-      datumi.push(d.toISOString().substring(0, 10));
+      datumi.push(this.formatDateLocal(d));
     }
-
     return datumi;
   }
 
@@ -138,21 +79,16 @@ export class StatsComponent implements OnInit {
     const mesec = danas.getMonth();
     const godina = danas.getFullYear();
     const datumi: string[] = [];
-
     for (let dan = 1; dan <= danas.getDate(); dan++) {
       const d = new Date(godina, mesec, dan);
-      datumi.push(d.toISOString().substring(0, 10));
+      datumi.push(this.formatDateLocal(d));
     }
-
     return datumi;
   }
-}
 
-export interface StatistikaPoseta {
-  danas: number;
-  juce: number;
-  prekjuce: number;
-  nedelja: number;
-  mesec: number;
-  ukupno: number;
+  private formatDateLocal(d: Date): string {
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
 }
