@@ -4,12 +4,14 @@ import {MenuComponent} from "./menu/menu.component";
 import {FoodCategoryComponent} from "./pages/food-category/food-category.component";
 import {DrinksNonAlcoholComponent} from "./pages/drinks-non-alcohol/drinks-non-alcohol.component";
 import {DrinksAlcoholComponent} from "./pages/drinks-alcohol/drinks-alcohol.component";
+import {StatsComponent} from "./pages/stats/stats.component";
 
 const routes: Routes = [
   { path: '', component: MenuComponent },
   { path: 'pages/drinks-alcohol', component: DrinksAlcoholComponent },
   { path: 'pages/drinks-non-alcohol', component: DrinksNonAlcoholComponent },
   { path: 'pages/food-category', component: FoodCategoryComponent },
+  { path: 'stats/:key', component: StatsComponent}
 ];
 
 
